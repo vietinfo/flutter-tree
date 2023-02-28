@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class TreeNodeData {
   String title;
+  String content;
+  DateTime? timeData;
   bool expanded;
   bool checked;
   dynamic extra;
@@ -13,6 +15,7 @@ class TreeNodeData {
 
   TreeNodeData({
     required this.title,
+    required this.content,
     required this.expanded,
     required this.checked,
     required this.children,
@@ -21,10 +24,19 @@ class TreeNodeData {
     this.checkBoxFillColor,
     this.backgroundColor,
     this.customActions,
+    this.timeData,
   });
 
-  TreeNodeData.from(TreeNodeData other):
-    this(title: other.title, expanded: other.expanded, checked: other.checked, extra: other.extra, children: other.children);
+  TreeNodeData.from(TreeNodeData other)
+      : this(
+          title: other.title,
+          expanded: other.expanded,
+          checked: other.checked,
+          extra: other.extra,
+          children: other.children,
+          content: other.content,
+          timeData: other.timeData,
+        );
 
   @override
   String toString() {
