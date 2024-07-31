@@ -31,6 +31,8 @@ class TreeView extends StatefulWidget {
 
   final TreeNodeData Function(TreeNodeData parent)? append;
   final Future<List<TreeNodeData>> Function(TreeNodeData parent)? load;
+  final Widget Function(BuildContext context, TreeNodeData node)
+      subtitleBuilder;
 
   const TreeView({
     Key? key,
@@ -54,6 +56,7 @@ class TreeView extends StatefulWidget {
     this.contentTappable = false,
     this.icon = const Icon(Icons.expand_more, size: 16.0),
     this.manageParentState = false,
+    required this.subtitleBuilder,
   }) : super(key: key);
 
   @override
@@ -74,7 +77,8 @@ class _TreeViewState extends State<TreeView> {
         tempNode.children = _filter(val, tempNode.children);
       }
 
-      if (tempNode.title.contains(RegExp(val, caseSensitive: false)) || tempNode.children.isNotEmpty) {
+      if (tempNode.title.contains(RegExp(val, caseSensitive: false)) ||
+          tempNode.children.isNotEmpty) {
         tempNodes.add(tempNode);
       }
     }
@@ -180,6 +184,8 @@ class _TreeViewState extends State<TreeView> {
                 onRemove: widget.onRemove ?? (n, p) {},
                 onAppend: widget.onAppend ?? (n, p) {},
                 onCollapse: widget.onCollapse ?? (n) {},
+                subtitleBuilder: (context, content) =>
+                    widget.subtitleBuilder(context, _renderList[index]),
               );
             },
           )

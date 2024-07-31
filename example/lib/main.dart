@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     final data = [
       TreeNodeData(
         title: 'Load node 1',
+        content: 'Load node 1 content',
         expanded: false,
         checked: true,
         children: [],
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       ),
       TreeNodeData(
         title: 'Load node 2',
+        content: 'Load node 2 content',
         expanded: true,
         checked: false,
         children: [],
@@ -49,10 +51,14 @@ class MyApp extends StatelessWidget {
             print(parent.extra);
             return TreeNodeData(
               title: 'Appended',
+              content: 'Appended content',
               expanded: true,
               checked: true,
               children: [],
             );
+          },
+          subtitleBuilder: (context, node) {
+            return const Text('Subtitle');
           },
           onLoad: (node) {
             print('onLoad');

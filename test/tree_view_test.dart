@@ -8,9 +8,13 @@ MaterialApp myApp = MaterialApp(
       showFilter: true,
       showActions: true,
       showCheckBox: true,
+      subtitleBuilder: (context, node) {
+        return const Text('subtitle');
+      },
       data: [
         TreeNodeData(
           title: 'title',
+          content: 'content',
           expanded: false,
           checked: false,
           children: [],

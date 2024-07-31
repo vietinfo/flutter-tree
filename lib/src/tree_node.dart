@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../flutter_tree.dart';
 
@@ -15,6 +14,8 @@ class TreeNode extends StatefulWidget {
   final bool contentTappable;
   final double offsetLeft;
   final int? maxLines;
+
+  final Widget Function(BuildContext context, String content) subtitleBuilder;
 
   final Function(TreeNodeData node) onTap;
   final void Function(bool checked, TreeNodeData node) onCheck;
@@ -38,6 +39,7 @@ class TreeNode extends StatefulWidget {
     this.parentState,
     required this.offsetLeft,
     this.maxLines,
+    required this.subtitleBuilder,
     required this.showCheckBox,
     required this.showActions,
     required this.contentTappable,
@@ -59,7 +61,8 @@ class TreeNode extends StatefulWidget {
   _TreeNodeState createState() => _TreeNodeState();
 }
 
-class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin {
+class _TreeNodeState extends State<TreeNode>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   bool _isChecked = false;
   bool _showLoading = false;
@@ -89,6 +92,7 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
         onCollapse: widget.onCollapse,
         onRemove: widget.onRemove,
         onAppend: widget.onAppend,
+        subtitleBuilder: widget.subtitleBuilder,
       );
     });
   }
@@ -117,7 +121,8 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     if (widget.parentState != null) _isChecked = widget.data.checked;
 
-    bool hasData = widget.data.children.isNotEmpty || (widget.lazy && !_isExpanded);
+    bool hasData =
+        widget.data.children.isNotEmpty || (widget.lazy && !_isExpanded);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +130,9 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
         InkWell(
           splashColor: widget.contentTappable ? null : Colors.transparent,
           highlightColor: widget.contentTappable ? null : Colors.transparent,
-          mouseCursor: widget.contentTappable ? SystemMouseCursors.click : MouseCursor.defer,
+          mouseCursor: widget.contentTappable
+              ? SystemMouseCursors.click
+              : MouseCursor.defer,
           onTap: widget.contentTappable
               ? () {
                   if (hasData) {
@@ -154,7 +161,8 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 15),
                       child: Row(
                         children: [
                           SizedBox(
@@ -163,9 +171,12 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(50.0)),
                                 boxShadow: [
-                                  BoxShadow(color: Colors.grey.withOpacity(0.2), spreadRadius: 2),
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 2),
                                 ],
                               ),
                               child: const Padding(
@@ -226,14 +237,17 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
                           //   ),
                           Expanded(
                             child: Container(
-                              key: ValueKey(widget.data.backgroundColor?.call()),
+                              key:
+                                  ValueKey(widget.data.backgroundColor?.call()),
                               color: widget.data.backgroundColor?.call(),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6.0),
                                 child: QuaTrinhDetailItem(
                                   title: widget.data.title,
                                   content: widget.data.content,
                                   timeData: widget.data.timeData,
+                                  subtitleBuilder: widget.subtitleBuilder,
                                 ),
                               ),
                             ),
@@ -241,7 +255,9 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
                           RotationTransition(
                             child: IconButton(
                               iconSize: 20,
-                              icon: hasData ? widget.icon : const SizedBox.shrink(),
+                              icon: hasData
+                                  ? widget.icon
+                                  : const SizedBox.shrink(),
                               onPressed: hasData
                                   ? () {
                                       widget.onTap(widget.data);
@@ -330,13 +346,21 @@ class _TreeNodeState extends State<TreeNode> with SingleTickerProviderStateMixin
 class QuaTrinhDetailItem extends StatelessWidget {
   final String title;
   final String content;
+  final Widget Function(BuildContext context, String content) subtitleBuilder;
   final DateTime? timeData;
-  const QuaTrinhDetailItem({Key? key, required this.title, required this.content, this.timeData}) : super(key: key);
+  const QuaTrinhDetailItem({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.subtitleBuilder,
+    this.timeData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // List<String> listFile =
     //     quaTrinhChiTietModel.danhSachDinhKem.isNotNullEmpty() ? quaTrinhChiTietModel.danhSachDinhKem!.split('☺') : [];
+    final subtitle = subtitleBuilder(context, content);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,27 +368,7 @@ class QuaTrinhDetailItem extends StatelessWidget {
           title,
           style: const TextStyle(color: Colors.blue),
         ),
-        Builder(
-          builder: (context) {
-            String status;
-            String sub;
-            if (content == 'O') {
-              status = 'Chưa xử lý';
-              if (content == '1') {
-                sub = 'Đã xem';
-              } else {
-                sub = 'Chưa Xem';
-              }
-            } else {
-              status = 'Đã xử lý';
-              sub = timeData != null ? DateFormat('dd/MM/yyyy').format(timeData!) : '';
-            }
-            return Text(
-              '$status ($sub)',
-              style: const TextStyle(color: Colors.red),
-            );
-          },
-        ),
+        subtitle,
         // if (quaTrinhChiTietModel.noiDungXuLy.isNotNullEmpty())
         //   Text(
         //     '${quaTrinhChiTietModel.noiDungXuLy}'.removeHtmlTag(),
@@ -397,7 +401,6 @@ class QuaTrinhDetailItem extends StatelessWidget {
   //     builder: (context) => FileBottomSheet(files: files),
   //   );
   // }
-
 }
 
 class _DashedLineVerticalPainter extends CustomPainter {

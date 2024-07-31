@@ -42,6 +42,7 @@ TreeNodeData mapServerDataToTreeData(Map data) {
   return TreeNodeData(
     extra: data,
     title: data['text'],
+    content: data['text'],
     expanded: data['show'],
     checked: data['checked'],
     children:
