@@ -15,7 +15,8 @@ class TreeNode extends StatefulWidget {
   final double offsetLeft;
   final int? maxLines;
 
-  final Widget Function(BuildContext context, String content) subtitleBuilder;
+  final Widget Function(BuildContext context, TreeNodeData node)
+      subtitleBuilder;
 
   final Function(TreeNodeData node) onTap;
   final void Function(bool checked, TreeNodeData node) onCheck;
@@ -69,7 +70,7 @@ class _TreeNodeState extends State<TreeNode>
   late AnimationController _rotationController;
   final Tween<double> _turnsTween = Tween<double>(begin: -0.25, end: 0.0);
 
-  List<TreeNode> _geneTreeNodes(List list) {
+  List<TreeNode> _geneTreeNodes(List<TreeNodeData> list) {
     return List.generate(list.length, (int index) {
       return TreeNode(
         data: list[index],
@@ -92,7 +93,10 @@ class _TreeNodeState extends State<TreeNode>
         onCollapse: widget.onCollapse,
         onRemove: widget.onRemove,
         onAppend: widget.onAppend,
-        subtitleBuilder: widget.subtitleBuilder,
+        subtitleBuilder: (context, content) => widget.subtitleBuilder.call(
+          context,
+          list[index],
+        ),
       );
     });
   }
@@ -244,9 +248,7 @@ class _TreeNodeState extends State<TreeNode>
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 6.0),
                                 child: QuaTrinhDetailItem(
-                                  title: widget.data.title,
-                                  content: widget.data.content,
-                                  timeData: widget.data.timeData,
+                                  node: widget.data,
                                   subtitleBuilder: widget.subtitleBuilder,
                                 ),
                               ),
@@ -344,28 +346,27 @@ class _TreeNodeState extends State<TreeNode>
 }
 
 class QuaTrinhDetailItem extends StatelessWidget {
-  final String title;
-  final String content;
-  final Widget Function(BuildContext context, String content) subtitleBuilder;
-  final DateTime? timeData;
+  final TreeNodeData node;
+
+  final Widget Function(BuildContext context, TreeNodeData node)
+      subtitleBuilder;
+
   const QuaTrinhDetailItem({
     Key? key,
-    required this.title,
-    required this.content,
+    required this.node,
     required this.subtitleBuilder,
-    this.timeData,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // List<String> listFile =
     //     quaTrinhChiTietModel.danhSachDinhKem.isNotNullEmpty() ? quaTrinhChiTietModel.danhSachDinhKem!.split('☺') : [];
-    final subtitle = subtitleBuilder(context, content);
+    final subtitle = subtitleBuilder(context, node);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          node.title,
           style: const TextStyle(color: Colors.blue),
         ),
         subtitle,
