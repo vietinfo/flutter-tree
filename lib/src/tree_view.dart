@@ -184,8 +184,7 @@ class _TreeViewState extends State<TreeView> {
                 onRemove: widget.onRemove ?? (n, p) {},
                 onAppend: widget.onAppend ?? (n, p) {},
                 onCollapse: widget.onCollapse ?? (n) {},
-                subtitleBuilder: (context, content) =>
-                    widget.subtitleBuilder(context, _renderList[index]),
+                subtitleBuilder: widget.subtitleBuilder,
               );
             },
           )

@@ -93,10 +93,7 @@ class _TreeNodeState extends State<TreeNode>
         onCollapse: widget.onCollapse,
         onRemove: widget.onRemove,
         onAppend: widget.onAppend,
-        subtitleBuilder: (context, content) => widget.subtitleBuilder.call(
-          context,
-          list[index],
-        ),
+        subtitleBuilder: widget.subtitleBuilder,
       );
     });
   }
